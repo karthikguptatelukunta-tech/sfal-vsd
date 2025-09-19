@@ -27,7 +27,7 @@ $ sudo apt-get install iverilog
 ```bash
 $ sudo apt update
 $ sudo apt install gtkwave
+![WhatsApp Image 2025-09-19 at 23 33 45](https://github.com/user-attachments/assets/61431f8d-6f14-453f-b52f-5f36052e50f1)
+![WhatsApp Image 2025-09-19 at 23 33 45 (1)](https://github.com/user-attachments/assets/c78e971f-283f-47d0-a7a5-0291148479bf)
 
-![gtkwave](https://github.com/user-attachments/assets/4ca9c5a9-bcb4-48ee-8bf6-e7cce3b33286)
 
-![gtkwave1](https://github.com/user-attachments/assets/8cdc0abe-5b9e-4347-b22e-433751a126f1)
