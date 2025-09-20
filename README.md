@@ -14,7 +14,7 @@ $ sudo apt-get install build-essential clang bison flex \
 $ make
 $ sudo make install
 
-![image alt](https://github.com/karthikguptatelukunta-tech/sfal-vsd/blob/b8bffd208e48dba2eb2bb765b9d9fe4c9de4fbfd/WhatsApp%20Image%202025-09-19%20at%2023.33.44.jpeg)
+![image alt](image_url)
 
 ### iverilog
 ```bash
