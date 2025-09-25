@@ -111,22 +111,34 @@ gtkwave tb_good_mux.vcd
 ```
 The waveform in gtwave is shown below
 
---image pettali
+![WhatsApp Image 2025-09-25 at 22 06 27](https://github.com/user-attachments/assets/c503ee07-1471-4e84-b20d-0c1f064c3964)
+
 
 ## Introduction to Yosys
 It is the synthesizer used to convert RTL to netlist.
 Netlist should be the same as the Design but represented in the form of standard cells.
 The same testbench can be used to verify RTL and Synthesized Netlist.
 
---image pettali
+<img width="1866" height="989" alt="Screenshot 2025-09-25 155905" src="https://github.com/user-attachments/assets/5c4e22bd-e9b2-411a-82f0-04d6f44dbf71" />
+
 
 ## Introduction to Logic Synthesis
 
---image pettali
+<img width="1866" height="1079" alt="Screenshot 2025-09-25 160029" src="https://github.com/user-attachments/assets/c40f7df7-8755-46ca-8256-4d1be34bf77a" />
+<img width="1427" height="1027" alt="Screenshot 2025-09-25 160201" src="https://github.com/user-attachments/assets/fca35285-04ca-48e9-8198-52b582494c04" />
+
+
 
 ## Lab using Yosys and Sky130 PDKs
 
---images pettali
+![WhatsApp Image 2025-09-25 at 22 11 10](https://github.com/user-attachments/assets/ecc2c7d5-348e-41b5-957b-105ca47d984e)
+![WhatsApp Image 2025-09-25 at 22 11 11](https://github.com/user-attachments/assets/43262f4d-e8d5-432b-8c6e-9b0270c633a9)
+![WhatsApp Image 2025-09-25 at 22 11 11 (1)](https://github.com/user-attachments/assets/ffbc2664-5853-46d3-9737-338b67a4a5d8)
+![WhatsApp Image 2025-09-25 at 22 11 11 (2)](https://github.com/user-attachments/assets/b4e68d4b-f8cc-4f32-8aff-07cd76372254)
+
+
+
+
 
 </details>
 
