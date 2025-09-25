@@ -45,7 +45,10 @@ Folder structure of the git clone:
 - `my_lib/verilog_models` - will contain standard cell verilog model
 - `verilog_files` -contains the lab experiments source files
 
---image petali
+<img width="1541" height="784" alt="Screenshot 2025-09-25 151227" src="https://github.com/user-attachments/assets/c4a5d59f-71f6-4c5c-b194-437c7ac91376" />
+<img width="1904" height="1018" alt="Screenshot 2025-09-25 151402" src="https://github.com/user-attachments/assets/6f42da14-0842-44fd-a97f-ac39cc153a69" />
+
+
 
 Example of a design good_mux.v 
 
