@@ -34,7 +34,8 @@ $ sudo apt install gtkwave
 ![WhatsApp Image 2025-09-19 at 23 33 45](https://github.com/user-attachments/assets/61431f8d-6f14-453f-b52f-5f36052e50f1)
 ![WhatsApp Image 2025-09-19 at 23 33 45 (1)](https://github.com/user-attachments/assets/03ecd167-3d8b-45e6-828c-df115ab34e68)
 </details>
-
+<details>
+	<summary>Day 1 - Introduction to Verilog RTL Design and Synthesis </summary>
 
 # Day 1 - Introduction to Verilog RTL Design and Synthesis
 ## Introduction to open-source simulator Iverilog
@@ -126,7 +127,5 @@ The same testbench can be used to verify RTL and Synthesized Netlist.
 
 </details>
 
-<details>
 
-<summary>Day 2 - Timing libs, Hierarchical vs Flat Synthesis and Efficient Flop Coding Styles </summary>
 
