@@ -141,6 +141,90 @@ The same testbench can be used to verify RTL and Synthesized Netlist.
 
 
 </details>
+<details>
+<summary>Day 2 - Timing libs, Hierarchical vs Flat Synthesis and Efficient Flop Coding Styles </summary>
+# Day 2 - Timing libs, Hierarchical vs Flat Synthesis and Efficient Flop Coding Styles
+Standard cell libraries are characterized across **PVT (Process, Voltage, Temperature)** conditions to model real-world variations.  
+
+- **Process (P):** Variations due to fabrication (e.g., fast, slow, typical).  
+- **Voltage (V):** Variations in supply voltage levels.  
+- **Temperature (T):** Variations in operating temperature.  
+
+💡 Library filenames typically encode these conditions:  
+- **`tt`** → Typical process corner  
+- **`025C`** → Characterized at 25 °C  
+- **`1v80`** → Characterized at 1.8 V  
+
+**Example:**  
+my_lib_tt_025C_1v80.lib
+This corresponds to **typical process**, **25 °C temperature**, and **1.8 V voltage**.
+
+<img width="827" height="834" alt="Screenshot 2025-09-25 212420" src="https://github.com/user-attachments/assets/323e2dfc-d72e-46eb-81b5-c88c10fb4109" />
+
+## Hierarchical vs Flat Synthesis
+
+### Hierarchical Synthesis
+##  Report after Synthesizing `multiple_modules.v`
+
+After synthesis, the **sub-module statistics** are printed.  
+- Example: `sub_module1` has **1 AND gate** and `sub_module2` has **1 OR gate**.  
+- This demonstrates **Hierarchical Synthesis**.
+
+###  Hierarchy Preservation
+- `sub_module1` and `sub_module2` are instantiated separately in the synthesized Verilog netlist.  
+- Instead of directly showing AND/OR gates, we see the **sub-modules** when running the `show` command (as seen in the screenshot).  
+
+###  Inside `sub_module2` (in synthesized netlist `multiple_modules_hier.v`)
+- Instead of an OR gate, the inputs **a & b** pass through an **inverter** and then a **NAND gate**.  
+- Reason: In CMOS, stacking **PMOS** (as in an OR gate) is inefficient, since PMOS has lower mobility and must be made wider to achieve meaningful output.  
+- Hence, the synthesis tool optimizes the OR function into **INV + NAND**.  
+
+👉 The next step is to analyze the **`.lib` file** for deeper understanding of how this mapping is performed.
+![WhatsApp Image 2025-09-26 at 17 05 16](https://github.com/user-attachments/assets/3f26a54c-21e9-461f-ad18-d3e7dc70a8f6)
+![WhatsApp Image 2025-09-26 at 17 05 59](https://github.com/user-attachments/assets/fa10a091-a057-4c58-88a3-b113eb0cb26f)
+![WhatsApp Image 2025-09-26 at 17 05 15](https://github.com/user-attachments/assets/8573f77f-7c78-496b-96b6-89a20332a4a9)
+### Flat Synthesis
+The design can be flattened by using the command `flatten`.
+
+Screenshot shows the command, synthesized netlist and the logical diagram.
+<img width="1655" height="850" alt="Screenshot 2025-09-26 164629" src="https://github.com/user-attachments/assets/9dbec2cc-ce0d-43b1-ae39-0431a95bcd31" />
+### Sub-module Level Synthesis
+RTL (Register Transfer Level) designs are often modular, with various functional blocks or sub-modules. Sub-module level synthesis allows each of these sub-modules to be synthesized independently.
+## 🔎 Why Sub-Module Level Synthesis?
+
+Sub-module level synthesis is an important step in digital design because it allows finer control and better results during optimization. Some key benefits are:
+
+- **Optimization and Area Reduction:**  
+  Each sub-module is optimized on its own. The synthesis tool can apply logic optimizations, technology mapping, and area minimization locally, which leads to efficient use of resources and a smaller overall chip area.  
+
+- **Reusability:**  
+  Sub-modules can be designed, verified, and optimized independently. Once created, they can be reused across multiple designs, saving effort and improving design productivity.  
+
+- **Parallel Processing:**  
+  For large projects, different sub-modules can be synthesized in parallel. This makes the overall synthesis process faster and more scalable.  
+
+---
+
+### 🛠️ Running Sub-Module Synthesis  
+
+Below are the commands to synthesize a specific sub-module:  
+
+```bash
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog multiple_modules.v
+synth -top sub_module1
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+```
+<img width="830" height="616" alt="Screenshot 2025-09-26 171240" src="https://github.com/user-attachments/assets/179b8fe8-8956-4d03-a4f4-86783acaf06f" />
+
+
+
+
+
+
+
+
 
 
 
