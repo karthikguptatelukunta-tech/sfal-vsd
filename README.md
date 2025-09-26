@@ -219,6 +219,80 @@ show
 <img width="830" height="616" alt="Screenshot 2025-09-26 171240" src="https://github.com/user-attachments/assets/179b8fe8-8956-4d03-a4f4-86783acaf06f" />
 
 
+## Various Flop Coding Styles and Optimization
+
+### Why do we need flops and how do they prevent glitches in the circuit?
+
+Why Flops Help Prevent Glitches
+
+Glitches in digital circuits often show up because of signal delays, noise, or timing mismatches. Flip-flops (flops) play a big role in keeping things clean and stable:
+
+Synchronization: Flops are edge-triggered. They only “listen” on clock edges (rising or falling), so outputs don’t randomly toggle when inputs wiggle in between. This makes sure the output updates in a controlled way, not due to short-lived glitches.
+
+Timing Control: Since flops are driven by a clock, all updates happen in sync across the design. That clocked behavior prevents mismatched arrival times of signals from creating unwanted glitches.
+
+In short, flops act like a timing checkpoint—capturing signals only at defined moments and filtering out noise or spurious transitions.
+<img width="846" height="867" alt="324639488-32aab966-261a-4e42-9f49-59572586cd0f" src="https://github.com/user-attachments/assets/158f932d-3750-4b2e-b4eb-b9c14284dfa4" />
+### Different types of flops
+To initialize flops, we need to `set` and `reset` which can be synchronous or asynchronous
+<img width="775" height="423" alt="324651651-338b941f-4a51-4cf3-9289-f344afac2922" src="https://github.com/user-attachments/assets/d632e03d-d85e-4c3f-a153-1859446967c4" />
+![WhatsApp Image 2025-09-26 at 23 17 53](https://github.com/user-attachments/assets/2fa482f7-80d5-4e0b-9de8-b41db0cf03bd)
+![WhatsApp Image 2025-09-26 at 23 17 54](https://github.com/user-attachments/assets/8cfddd98-f0f4-4c90-9122-a101d112d388)
+![WhatsApp Image 2025-09-26 at 23 17 54 (1)](https://github.com/user-attachments/assets/de4d41ed-ac60-4485-b50c-1b3d5d87df60)
+![WhatsApp Image 2025-09-26 at 23 17 55](https://github.com/user-attachments/assets/670a5892-c34a-46fc-a697-a3d9cb0e7285)
+![WhatsApp Image 2025-09-26 at 23 17 55 (1)](https://github.com/user-attachments/assets/653bd990-7c62-46ac-b364-f9b04fd70cbf)
+![WhatsApp Image 2025-09-26 at 23 17 55 (2)](https://github.com/user-attachments/assets/6c9c12ff-0849-4fd0-a8b9-29995f926b59
+![WhatsApp Image 2025-09-26 at 23 17 56](https://github.com/user-attachments/assets/adaedfb0-d5cc-4368-a9a8-f646cb889e4d)
+
+### Synthesizing flops
+The command to synthesize ***DFF with asynchronous reset*** as an example
+```
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog dff_asyncres.v
+synth -top dff_asyncres
+dfflibmap -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+```
+![WhatsApp Image 2025-09-26 at 23 17 55](https://github.com/user-attachments/assets/b3cd999e-5789-4f96-9a9d-ba05d3e3510a)
+![WhatsApp Image 2025-09-26 at 23 17 55 (1)](https://github.com/user-attachments/assets/c51ad20c-ea30-4a2c-aff5-eaab1eb4a033)
+![WhatsApp Image 2025-09-26 at 23 17 55 (2)](https://github.com/user-attachments/assets/e95f6003-3de8-4ee5-bc64-6c43f1ef0568)
+![WhatsApp Image 2025-09-26 at 23 17 56](https://github.com/user-attachments/assets/dbc90c93-e363-4539-8c6d-fbcdb1a77a90)
+
+### Synthesizing mult2 (multiply by 2)
+
+ 
+To implement `y[3:0] = 2*a[2:0]`, we append a `1'b0 `to the `a[2:0]` i.e, `y[3:0] = {a[2:0],0}`. This is also equal to left shift the input bits by 1.
+This can be realized by just wiring.
+So we expect no hardware which is also seen in the screenshot below, analysis after synthesis and show. The command 'abc' is not required for mapping when there are no cells.
+
+![WhatsApp Image 2025-09-26 at 23 29 03](https://github.com/user-attachments/assets/178dc861-bfbd-4b97-8324-2185ce4d2ed4)
+![WhatsApp Image 2025-09-26 at 23 29 04](https://github.com/user-attachments/assets/9c8b030d-bb94-4187-b01f-436ce7d4896b)
+![WhatsApp Image 2025-09-26 at 23 29 04 (1)](https://github.com/user-attachments/assets/39744db2-3532-482c-b055-7aa5de7f1070)
+### Synthesizing mult9 (multiply by 9 or 8+1)
+
+`y=9*a` can be considered `8*a+1*a`
+To implement `y[5:0] = 9*a[2:0]`, we append `000` to `a[2:0]` and then add `a` i.e, `y[5:0] = {a[2:0],000} + a[2:0]`.
+This can be realized just by wiring.
+So we expect no hardware which is also seen in the screenshot below, analysis after synthesis and show. The command 'abc' is not required for mapping when there are no cells.
+![WhatsApp Image 2025-09-26 at 23 30 52](https://github.com/user-attachments/assets/86cab940-27b5-44b8-b07c-b7f3cf8c8d53)
+![WhatsApp Image 2025-09-26 at 23 31 29](https://github.com/user-attachments/assets/80acf8a2-61de-433c-82f5-73e8d5e1112b)
+![WhatsApp Image 2025-09-26 at 23 30 52 (1)](https://github.com/user-attachments/assets/2330f8ca-a128-4d59-ae5d-c539b430c210
+</details>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
