@@ -280,6 +280,41 @@ So we expect no hardware which is also seen in the screenshot below, analysis af
 ![WhatsApp Image 2025-09-26 at 23 30 52 (1)](https://github.com/user-attachments/assets/2330f8ca-a128-4d59-ae5d-c539b430c210
 </details>
 
+<details>
+	<summary>Day 3 - Combinational and Sequential Optimizations </summary>
+	
+# Day 3 - Combinational and Sequential Optimizations
+
+## Introduction to Optimizations
+
+### Combinational Logic Optimization
+Logic optimization is all about squeezing the design to make it more efficient in terms of area and power.
+
+Two of the most common techniques are:
+
+Constant Propagation – simplifying logic by directly replacing signals with known constant values.
+
+Boolean Logic Optimization – using methods like K-maps or Quine-McCluskey to minimize expressions.
+<img width="618" height="324" alt="326310525-c8bd1118-52f7-441b-8cff-254d851cb892" src="https://github.com/user-attachments/assets/c5babb75-241e-4a5c-9f56-66b47b66b19c" />
+
+
+one such example is shown below
+<img width="619" height="300" alt="326311271-aa864102-ef33-4d45-9ec9-929738172cd4" src="https://github.com/user-attachments/assets/62166bce-2939-4c58-999f-dc6d233f04f3" />
+### Sequential Logic Optimization
+The technqiues used are:
+1) Basic
+   - Sequential constant propagation
+2) Advanced (not covered as part of lab)
+   - Static optimization
+   - Retiming
+   - Sequential logic cloning (floorplan aware synthesis)
+
+An example of sequential constant propagation is highlighted below of DFF with asynchronous reset where D input is grounded. To note, the same technique cannot be applied to DFF with the asynchronous set because while `Q=1` when `Set=1`, but `Q=0` at `Set=0` at the next CLK pulse. Q is dependent not only on Set but also on the clock edge.
+<img width="629" height="348" alt="326312711-3e31a212-a0b0-42c3-be92-d0075a9f7d1c" src="https://github.com/user-attachments/assets/8d26b664-c3cc-424e-81b5-6f34c832083c" />
+Retiming is a technique to improve the performance of the circuit.
+<img width="600" height="337" alt="326621258-23bcc15c-813b-496a-aebf-ebbf5ceba557" src="https://github.com/user-attachments/assets/538164d5-418a-489b-94f6-83d27305d7ad" />
+
+
 
 
 
