@@ -546,7 +546,58 @@ show
 <img width="1669" height="386" alt="326793572-95bbe05c-bdde-4bdd-8fe7-492be015dc9f" src="https://github.com/user-attachments/assets/a3d29d01-00ed-4601-a80a-8c23604e6e0b" />
 <img width="1167" height="471" alt="326793600-11cd582b-4ccd-4b99-82e2-1c68c92db131" src="https://github.com/user-attachments/assets/9f159fe7-ca84-4348-b26d-2a2081b2dc7c" />
 
+<details>
 
+ <summary>Day 4 - GLS, Blocking vs Non-blocking and Synthesis-Simulation Mismatch</summary>
+ 
+# Day 4 - GLS, Blocking vs Non-blocking and Synthesis-Simulation Mismatch
+
+## GLS, Synthesis-Simulation Mismatch, and Blocking/Non-blocking Statements
+After synthesis, it’s important to validate the design to make sure it still behaves as expected. The key checks are:
+
+-**Functional Verification**
+Run simulations on the synthesized netlist to confirm that functionality matches the RTL design.
+
+-**Timing Verification**
+Ensure the design meets timing requirements. This is typically done through delay annotation (timing-aware simulation), where real gate delays from the .lib are applied to the netlist.
+<img width="529" height="240" alt="Screenshot 2025-09-27 133734" src="https://github.com/user-attachments/assets/27b17251-51ca-4089-938e-131cb0c4aefd" />
+
+### Synthesis Simulation Mismatches
+
+It happens because of the following reasons
+- Missing sensitivity list
+- Blocking vs non-blocking assignments
+- Non-standard verilog coding
+
+#### (1) Missing sensitivity list
+
+As shown in the screenshot below, `always` block is evaluated only when `sel` is changing. So output `y` is not evaluated when `sel` is not changing although `i0` and `i1` are changing. Rather it acts like a latch. The code on the right side represents the correct design coding for `mux`. In this case `always` is evaluated for any signal changes. 
+
+<img width="525" height="304" alt="Screenshot 2025-09-27 133744" src="https://github.com/user-attachments/assets/7ed95325-ac5a-4bc2-b595-23082fd3650a" />
+
+#### (2) Blocking vs Non-blocking Assignments
+##### Blocking Statements
+-Denoted by =
+-Executed sequentially in the order they appear inside the always block
+-Each statement completes before the next one starts
+##### Non-Blocking Statements
+-Denoted by <=
+-All right-hand side (RHS) expressions are evaluated when the always block is entered, and updates to the left-hand side (LHS) happen in parallel
+-Enables concurrent execution
+
+
+ The left side of the screenshot below gives us the correct execution. While the right side can lead to serious issues as `d` is assigned to `q` directly. ***So choosing non-blocking statements is best practice*** (highlighted in the screenshot below).
+ <img width="509" height="269" alt="Screenshot 2025-09-27 133754" src="https://github.com/user-attachments/assets/20227375-233f-4d74-9530-cf4e0a2e1c1d" />
+
+##### Blocking Statements Leading to Synthesis Simulation Mismatch
+
+In the code shown below, `y` gets the old `q0` value. This will mimic delay or flop. But when you synthesize, there will be no flop. If the order is changed (right side code), latest value of `q0` is assigned to `y`. 
+
+When synthesized, both will lead to the same circuit. However, simulation will result in different behavior. For the left side of the code, `y` gets the old `q0` value and for the right side of the code, `y` gets the latest `q0` value leading to a synthesis simulation mismatch. 
+
+This issue is resolved by using ***non-blocking statements***.
+
+<img width="499" height="265" alt="Screenshot 2025-09-27 133803" src="https://github.com/user-attachments/assets/36eeb1e4-a567-4d34-b686-3b1908e2ebf7" />
 
 
 
