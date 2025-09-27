@@ -394,6 +394,164 @@ The logic implementation after synthesis for multiple_module_opt.v is shown belo
 ![WhatsApp Image 2025-09-27 at 12 55 58](https://github.com/user-attachments/assets/72816d7c-32b8-45cd-affa-10ba122b57af)
 
 
+## Sequential Logic Optimizations
+
+Both the dff_const1.v and dff_const2 are explained below.
+
+<img width="851" height="415" alt="326765445-b9bede59-edaa-4f4f-ad90-9036c63aa4da" src="https://github.com/user-attachments/assets/fcffee66-49e3-40a4-b13a-39f575bc804e" />
+### Optimizing dff_const1.v
+
+Syntax for dff_const1.v
+```
+module dff_const1(input clk, input reset, output reg q);
+always @(posedge clk, posedge reset)
+begin
+	if(reset)
+		q <= 1'b0;
+	else
+		q <= 1'b1;
+end
+
+endmodule
+```
+For dff_const1.v, `q=0` as long as `reset=1`. However, when `reset=0` `q` doesn't immediately becomes `1` rather at the next rising edge of the `clk` as shown below. ***So the optimization cannot be applied***.
+
+![WhatsApp Image 2025-09-27 at 13 18 30](https://github.com/user-attachments/assets/0788ed96-75ad-4c3c-92cb-5d1bb781b7a6)
+
+The commands to run the synthesis
+```
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog dff_const1.v
+synth -top dff_const1
+dfflibmap -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+```
+
+The logic implementation after synthesis for dff_const1.v is shown below.
+![WhatsApp Image 2025-09-27 at 13 20 31](https://github.com/user-attachments/assets/f177515a-b1c0-4b9a-8dea-e32c7d7a749f)
+similarly,
+![WhatsApp Image 2025-09-27 at 13 22 24](https://github.com/user-attachments/assets/de7fa636-4688-46ac-89dc-841479ea562e)
+![WhatsApp Image 2025-09-27 at 13 22 24 (1)](https://github.com/user-attachments/assets/274aa7c9-fd36-4591-9eba-4560c91bc4d0)
+![WhatsApp Image 2025-09-27 at 13 22 25](https://github.com/user-attachments/assets/13b9be48-0275-4f29-986b-c8319bbd752a)
+![WhatsApp Image 2025-09-27 at 13 22 25](https://github.com/user-attachments/assets/ecdb25bd-3c76-4182-9d8c-f61836a52b1b)
+
+### Optimizing dff_const3.v (above images)
+
+Syntax for dff_const3.v
+```
+module dff_const3(input clk, input reset, output reg q);
+reg q1;
+
+always @(posedge clk, posedge reset)
+begin
+	if(reset)
+	begin
+		q <= 1'b1;
+		q1 <= 1'b0;
+	end
+	else
+	begin
+		q1 <= 1'b1;
+		q <= q1;
+	end
+end
+
+endmodule
+```
+For dff_const3.v, there are two flops.  `q1=0` as long as `reset=1`. However, when `reset=0` `q1` doesn't immediately becomes `1` rather at the next rising edge of the `clk` with some propagation delay as shown below. `q=1` as long as `reset=1`, acting as `set` rather than `reset`. However, when `reset=0` `q` samples `q1` as `0` as there are some propagation delay for `q1`as shown below. At the next `clk` edge `q` samples `q1` as `1`.
+***So the optimization cannot be applied***.
+
+The command to run HDL simulation
+```
+iverilog dff_const3.v tb_dff_const3.v
+./a.out
+gtkwave tb_dff_const3.vcd
+```
+The HDL simulation is shown below.
+
+The commands to run the synthesis
+```
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog dff_const3.v
+synth -top dff_const3
+dfflibmap -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+```
+
+## Sequential Optimzations for Unused Outputs
+
+### Optimization of Case1: 3-bit Up Counter with q[0] used (counter_opt.v)
+Example of a counter where bits at the position of [2] and [1] are unused.
+
+```
+module counter_opt (input clk , input reset , output q);
+reg [2:0] count;
+assign q = count[0];
+
+always @(posedge clk ,posedge reset)
+begin
+	if(reset)
+		count <= 3'b000;
+	else
+		count <= count + 1;
+end
+
+endmodule
+```
+The screenshot explains the logic of the counter. Only q[0] is used. ***So the optimization can be applied***.
+
+<img width="1200" height="506" alt="326786452-dbdbd8d5-a305-4f31-b8ba-a8c33d53d67a" src="https://github.com/user-attachments/assets/a7d3bedd-a022-4f98-a7b4-2cbe1e0ce3c1" />
+The commands to run the synthesis
+```
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog counter_opt.v
+synth -top counter_opt
+dfflibmap -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+```
+We see only one flop after the synthesis and also seen in synthesis report after `synth -top counter_opt.v`
+
+<img width="1672" height="506" alt="326789951-42d260a1-72bc-4d5f-b891-9fea58a57813" src="https://github.com/user-attachments/assets/56b9a09b-29eb-4344-80d1-abd4c037d5d8" />
+### Optimization of Case2: 3-bit Up Counter (counter_opt2.v)
+
+Example of a counter where all the bits are used.
+```
+module counter_opt (input clk , input reset , output q);
+reg [2:0] count;
+assign q = (count[2:0] == 3'b100);
+
+always @(posedge clk ,posedge reset)
+begin
+	if(reset)
+		count <= 3'b000;
+	else
+		count <= count + 1;
+end
+
+endmodule
+```
+The commands to run the synthesis
+```
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog counter_opt.v
+synth -top counter_opt
+dfflibmap -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+
+<img width="829" height="672" alt="326793539-a7c68bda-5619-4dd6-89d4-d8773c1bf345" src="https://github.com/user-attachments/assets/4d88e2ab-6c80-4d9f-afe0-4e5122fc8567" />
+<img width="1669" height="386" alt="326793572-95bbe05c-bdde-4bdd-8fe7-492be015dc9f" src="https://github.com/user-attachments/assets/a3d29d01-00ed-4601-a80a-8c23604e6e0b" />
+<img width="1167" height="471" alt="326793600-11cd582b-4ccd-4b99-82e2-1c68c92db131" src="https://github.com/user-attachments/assets/9f159fe7-ca84-4348-b26d-2a2081b2dc7c" />
+
+
+
+
+
+
+
 
 
 
