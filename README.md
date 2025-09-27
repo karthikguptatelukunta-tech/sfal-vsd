@@ -601,6 +601,146 @@ This issue is resolved by using ***non-blocking statements***.
 <img width="499" height="265" alt="Screenshot 2025-09-27 133803" src="https://github.com/user-attachments/assets/36eeb1e4-a567-4d34-b686-3b1908e2ebf7" />
 
 
+## Labs on GLS and Synthesis-Simulation Mismatch
+
+### Ternary operator MUX (ternary_operator_mux.v)
+
+The Verilog code of ternary_operator_mux.v
+```
+module ternary_operator_mux (input i0 , input i1 , input sel , output y);
+	assign y = sel?i1:i0;
+	endmodule
+```
+The command to run HDL simulation
+```
+iverilog ternary_operator_mux.v tb_ternary_operator_mux.v
+./a.out
+gtkwave tb_ternary_operator_mux.vcd
+```
+HDL Simulation waveform of ternary_operator_mux.v is shown in the screenshot below
+
+![WhatsApp Image 2025-09-27 at 14 44 31](https://github.com/user-attachments/assets/1adbe962-051e-4015-873e-876cf9a1206c)
+The commands to run the synthesis for ternary_operator_mux.v
+```
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog ternary_operator_mux.v
+synth -top ternary_operator_mux
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+write_verilog ternary_operator_mux_net.v
+```
+![WhatsApp Image 2025-09-27 at 14 46 21](https://github.com/user-attachments/assets/865e444d-cbf9-4b06-9deb-be98db7d60ea)
+The commands to do GLS for ternary_operator_mux.v
+```
+iverilog ../my_lib/verilog_model/primitives.v ../my_lib/verilog_model/sky130_fd_sc_hd.v ternary_operator_mux_net.v tb_ternary_operator_mux.v
+./a.out
+gtkwave tb_ternary_operator_mux.vcd
+```
+The GLS output is shown below.
+![WhatsApp Image 2025-09-27 at 14 46 21](https://github.com/user-attachments/assets/3215cc74-b084-4a0a-a909-29200b9c086f)
+
+### Bad MUX (bad_mux.v)
+
+The `always` block is executed only at `sel` signal. It works like a flop rather than mux.
+The Verilog code of bad_mux.v
+```
+module bad_mux (input i0 , input i1 , input sel , output reg y);
+always @ (sel)
+begin
+	if(sel)
+		y <= i1;
+	else 
+		y <= i0;
+end
+endmodule
+```
+
+The command to run HDL simulation
+```
+iverilog bad_mux.v tb_bad_mux.v
+./a.out
+gtkwave tb_bad_mux.vcd
+```
+HDL Simulation waveform of bad_mux.v is shown in the screenshot below
+![WhatsApp Image 2025-09-27 at 14 49 25](https://github.com/user-attachments/assets/c3d9435a-9dcc-4bee-9856-e9cdedce5893)
+
+The commands to run the synthesis for bad_mux.v.
+```
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog bad_mux.v
+synth -top bad_mux
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+write_verilog bad_mux_net.v
+```
+
+The synthesis report shows it is still inferring the mux but not the flop.
+![WhatsApp Image 2025-09-27 at 14 50 23](https://github.com/user-attachments/assets/5282f785-4846-4adf-b606-9dc42fb0beae)
+
+The commands to do GLS for bad_mux.v
+```
+iverilog ../my_lib/verilog_model/primitives.v ../my_lib/verilog_model/sky130_fd_sc_hd.v bad_mux_net.v tb_bad_mux.v
+./a.out
+gtkwave tb_bad_mux.vcd
+```
+The GLS output is shown below. This shows correct functionality which is different from HDL simulation, leading to ***synthesis simulation mismatch***.
+
+![WhatsApp Image 2025-09-27 at 14 51 35](https://github.com/user-attachments/assets/ae7b0fae-7986-4848-b347-44560acba3ca)
+
+## Labs on Synthesis-Simulation Mismatch for Blocking Statements
+
+### Blocking Caveat (blocking_caveat.v)
+
+The logic to simulate is shown below.
+<img width="594" height="346" alt="326985349-d7e6ea20-93fb-41d4-9f56-9910fe8f9931" src="https://github.com/user-attachments/assets/eb1049eb-884d-4dbe-aedd-fd4a5b89ef2c" />
+The Verilog code of blocking_caveat.v
+```
+module blocking_caveat (input a , input b , input  c, output reg d); 
+reg x;
+always @ (*)
+begin
+	d = x & c;
+	x = a | b;
+end
+endmodule
+```
+
+The command to run HDL simulation
+```
+iverilog blocking_caveat.v tb_blocking_caveat.v
+./a.out
+gtkwave tb_blocking_caveat.vcd
+```
+HDL Simulation waveform of blocking_caveat.v is shown in the screenshot below. `d` takes the old value of `x` causing incorrect functionality.
+![WhatsApp Image 2025-09-27 at 14 54 42](https://github.com/user-attachments/assets/93abda7b-be6a-4eee-9885-edf715237edd)
+
+The commands to run the synthesis for bad_mux.v.
+```
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog blocking_caveat.v
+synth -top blocking_caveat
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+write_verilog blocking_caveat_net.v
+```
+
+The synthesis report and logic synthesis is shown below.
+![WhatsApp Image 2025-09-27 at 14 56 04](https://github.com/user-attachments/assets/4c8b9c8b-d978-4327-94c6-cea1ec14c8bb)
+The commands to do GLS for bad_mux.v
+```
+iverilog ../my_lib/verilog_model/primitives.v ../my_lib/verilog_model/sky130_fd_sc_hd.v blocking_caveat_net.v tb_blocking_caveat.v
+./a.out
+gtkwave tb_blocking_caveat.vcd
+```
+The GLS output is shown below. In this case, `d` takes the current value of `x` causing incorrect functionality.The waveform shows correct functionality which is different from HDL simulation, leading to ***synthesis simulation mismatch***.
+<img width="981" height="463" alt="326988314-b8fcd356-8743-4098-aae8-bdbd8ab88a15" src="https://github.com/user-attachments/assets/6e589a90-5d92-4f83-a269-85337e00b0be" />
+</details>
+
+
+
+
+
+
 
 
 
