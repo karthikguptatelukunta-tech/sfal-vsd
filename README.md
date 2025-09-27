@@ -315,6 +315,83 @@ Retiming is a technique to improve the performance of the circuit.
 <img width="600" height="337" alt="326621258-23bcc15c-813b-496a-aebf-ebbf5ceba557" src="https://github.com/user-attachments/assets/538164d5-418a-489b-94f6-83d27305d7ad" />
 
 
+## Combinational Logic Optimizations
+Commands for optimization
+
+```
+opt_clean -purge
+```
+### Optimization of opt_check.v
+Syntax for opt_check.v
+```
+module opt_check (input a , input b , output y);
+        assign y = a?b:0;
+endmodule
+```
+For opt_check.v the assignment `y = a?b:0` reduces to `y = ab`. The screenshot shown below explains this
+<img width="533" height="304" alt="326625012-f4b6a999-f665-412f-a705-9496bfdd04c2" src="https://github.com/user-attachments/assets/8af34607-5afe-42fd-9aea-7175625f786d" /> 
+
+
+The logic implementation after synthesis for opt_check.v is shown below, showing only AND gate.
+
+![WhatsApp Image 2025-09-27 at 12 51 17](https://github.com/user-attachments/assets/dbb3d68d-cd8a-4c8d-bc96-44adf925213e) 
+
+### Optimization of opt_check2.v
+Syntax for opt_check2.v
+```
+module opt_check2 (input a , input b , output y);
+        assign y = a?1:b;
+endmodule
+```
+For opt_check2.v the assignment `y = a?1:b` reduces to `y = a + b`. 
+
+The logic implementation after synthesis for opt_check2.v is shown below, showing only OR gate.
+
+![WhatsApp Image 2025-09-27 at 12 52 40](https://github.com/user-attachments/assets/8aecb0a7-56db-4884-a67f-4cd505c39e04) 
+
+
+### Optimization of opt_check3.v
+Syntax for opt_check3.v
+```
+module opt_check3 (input a , input b, input c , output y);
+	assign y = a?(c?b:0):0;
+endmodule
+```
+For opt_check.v the assignment `y = a?(c?b:0):0` reduces to `y = abc`. The screenshot shown below explains this.
+
+<img width="541" height="286" alt="326627801-c9fb59d8-d080-4776-bec6-46e3b48b3d68" src="https://github.com/user-attachments/assets/f1daa2f0-7264-43a4-96e6-77b40090152c" />
+
+The logic implementation after synthesis for opt_check3.v is shown below, showing 3 input AND gate.
+
+![WhatsApp Image 2025-09-27 at 12 54 44](https://github.com/user-attachments/assets/e511efd0-0239-4834-aa7e-eb66165ea837)
+
+
+### Optimization of multiple_module_opt.v
+
+Syntax of multiple_module_opt.v
+```
+module sub_module1(input a , input b , output y);
+ assign y = a & b;
+endmodule
+
+module sub_module2(input a , input b , output y);
+ assign y = a^b;
+endmodule
+
+module multiple_module_opt(input a , input b , input c , input d , output y);
+wire n1,n2,n3;
+
+sub_module1 U1 (.a(a) , .b(1'b1) , .y(n1));
+sub_module2 U2 (.a(n1), .b(1'b0) , .y(n2));
+sub_module2 U3 (.a(b), .b(d) , .y(n3));
+
+assign y = c | (b & n1); 
+endmodule
+```
+
+The logic implementation after synthesis for multiple_module_opt.v is shown below.
+
+![WhatsApp Image 2025-09-27 at 12 55 58](https://github.com/user-attachments/assets/72816d7c-32b8-45cd-affa-10ba122b57af)
 
 
 
