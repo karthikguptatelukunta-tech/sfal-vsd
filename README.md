@@ -732,9 +732,106 @@ iverilog ../my_lib/verilog_model/primitives.v ../my_lib/verilog_model/sky130_fd_
 ./a.out
 gtkwave tb_blocking_caveat.vcd
 ```
+
 The GLS output is shown below. In this case, `d` takes the current value of `x` causing incorrect functionality.The waveform shows correct functionality which is different from HDL simulation, leading to ***synthesis simulation mismatch***.
 <img width="981" height="463" alt="326988314-b8fcd356-8743-4098-aae8-bdbd8ab88a15" src="https://github.com/user-attachments/assets/6e589a90-5d92-4f83-a269-85337e00b0be" />
 </details>
+
+<details>
+
+ <summary> Day 5 - Optimization in Synthesis </summary>
+**# Day 5 - Optimization in Synthesis**
+
+## If Case Constructs
+The `if-else` statement in Verilog is mainly used to create **priority logic**.  
+It evaluates conditions in sequence, giving higher priority to the first matching condition.  
+
+- If the first condition is true, all other conditions are ignored.  
+- Only when the first condition is false, the second is checked, and so on.  
+- The final `else` acts as a default when none of the conditions are true.  
+
+---
+
+## Example of Priority Logic
+
+```verilog
+if (cond1) begin
+    // Code for condition 1
+end else if (cond2) begin
+    // Code for condition 2
+end else if (cond3) begin
+    // Code for condition 3
+end else begin
+    // Default code
+end
+```
+One common mistake with if-else coding is creating inferred latches due to incomplete condition
+<img width="1373" height="709" alt="Screenshot 2025-09-27 162607" src="https://github.com/user-attachments/assets/74db36c1-a2b8-4cf8-b783-91f121893184" />
+<img width="1364" height="776" alt="Screenshot 2025-09-27 162803" src="https://github.com/user-attachments/assets/36ac072e-587a-456e-b3e5-fb988cc47d73" /> 
+
+## Labs on Incomplete If case,Incomplete overlapping case
+Some of executed screenshots
+<img width="1819" height="863" alt="Screenshot 2025-09-27 182511" src="https://github.com/user-attachments/assets/ea179fb7-c7a9-4b40-a8b1-c089b5f4b793" />
+<img width="1565" height="785" alt="Screenshot 2025-09-27 182611" src="https://github.com/user-attachments/assets/22b382fb-d13d-416b-a62b-b226b3fb7348" />
+<img width="1828" height="623" alt="Screenshot 2025-09-27 182724" src="https://github.com/user-attachments/assets/c6c2792b-0daf-488e-8e6d-cb21b322e741" />
+<img width="1851" height="506" alt="Screenshot 2025-09-27 182751" src="https://github.com/user-attachments/assets/bd6edf26-51ce-4c29-ae15-3dba199c1001" />
+## for loop,for generate
+
+#### `for` Loop
+- Used inside **procedural blocks** (`always`, `initial`).
+- Executes **sequentially** in simulation.
+- Mainly for **testbenches** or **simulation code**, but can also be used for RTL when unrolled by synthesis tools.
+- Example:
+  ```
+  module for_example;
+    reg [3:0] arr [0:3];
+    integer i;
+    
+    initial begin
+      for (i = 0; i < 4; i = i + 1) begin
+        arr[i] = i;   // sequentially assigns values
+      end
+    end
+  endmodule
+  ```
+### generate Loop
+-Used for structural replication of hardware at elaboration (compile) time.
+
+-Executes in parallel – creates multiple instances of hardware.
+
+-Must be declared inside a generate ... endgenerate block.
+
+-Useful for instantiating repeated modules, wires, or registers.
+
+Example:
+```
+module dff(input clk, d, output reg q);
+  always @(posedge clk) q <= d;
+endmodule
+
+module generate_example(input clk, input [3:0] d, output [3:0] q);
+  genvar i;
+  generate
+    for (i = 0; i < 4; i = i + 1) begin : dff_loop
+      dff u_dff (.clk(clk), .d(d[i]), .q(q[i]));
+    end
+  endgenerate
+endmodule
+```
+<img width="937" height="523" alt="Screenshot 2025-09-27 183017" src="https://github.com/user-attachments/assets/11ca269c-848f-4604-b067-9b8875d07ac2" />
+<img width="930" height="525" alt="Screenshot 2025-09-27 183043" src="https://github.com/user-attachments/assets/8ae5d529-cbae-491e-8e77-7c0cc7aaf5b1" />
+<img width="937" height="523" alt="Screenshot 2025-09-27 183059" src="https://github.com/user-attachments/assets/cbbf05c9-cfc3-496e-924b-b1c49df2d74b" />
+
+##Labs on for loop and for generate
+<img width="1203" height="319" alt="Screenshot 2025-09-27 183535" src="https://github.com/user-attachments/assets/f77beb8f-72db-4aec-bbc9-9c5c255edc06" />
+
+<img width="1832" height="590" alt="Screenshot 2025-09-27 183454" src="https://github.com/user-attachments/assets/a73a9880-386d-4c54-ade2-59c38c21c7da" /> 
+</details>
+
+
+
+
+
 
 
 
