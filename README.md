@@ -541,11 +541,12 @@ synth -top counter_opt
 dfflibmap -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
 abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
 show
-
+```
 <img width="829" height="672" alt="326793539-a7c68bda-5619-4dd6-89d4-d8773c1bf345" src="https://github.com/user-attachments/assets/4d88e2ab-6c80-4d9f-afe0-4e5122fc8567" />
 <img width="1669" height="386" alt="326793572-95bbe05c-bdde-4bdd-8fe7-492be015dc9f" src="https://github.com/user-attachments/assets/a3d29d01-00ed-4601-a80a-8c23604e6e0b" />
 <img width="1167" height="471" alt="326793600-11cd582b-4ccd-4b99-82e2-1c68c92db131" src="https://github.com/user-attachments/assets/9f159fe7-ca84-4348-b26d-2a2081b2dc7c" />
 
+</details>
 <details>
 
  <summary>Day 4 - GLS, Blocking vs Non-blocking and Synthesis-Simulation Mismatch</summary>
